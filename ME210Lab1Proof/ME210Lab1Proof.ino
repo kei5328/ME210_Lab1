@@ -49,6 +49,7 @@ void CountFallingEdges(void);
 /*---------------Module Variables---------------------------*/
 
 static uint8_t signalToggle;
+int potValue;
 
 /*---------------Lab 1 Main Functions-----------------------*/
 
@@ -72,7 +73,16 @@ void SetupPins() {
 }
 
 void UpdateOutputFrequency() {
-  //TODO
+  //read input
+	potValue = analogRead(PIN_POT);
+	uint8_t newOCR2A =  (analogRead(PIN_POT))/4;
+	
+	Serial.print("\n raw:");
+	Serial.println(analogRead(PIN_POT));
+	Serial.print("scaled:");
+	Serial.println(newOCR2A);
+	UpdateCompareMatchRegister(newOCR2A);
+  //call update 
 }
 
 void PrintIRFrequency() {
@@ -124,7 +134,11 @@ void SetupTimerInterrupt() {
 ******************************************************************************/
 
 void UpdateCompareMatchRegister(uint8_t newVal) {
-  //TODO
+  if (newVal>255) newVal=255;
+  if (newVal<15) newVal=16;
+  cli();  
+  OCR2A = newVal;
+  sei();  
 }
 
 /******************************************************************************
