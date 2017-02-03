@@ -50,6 +50,7 @@ void CountFallingEdges(void);
 
 static uint8_t signalToggle;
 int potValue;
+int counter;
 
 /*---------------Lab 1 Main Functions-----------------------*/
 
@@ -58,10 +59,19 @@ void setup() {
   signalToggle = 0;
   SetupPins();
   SetupTimerInterrupt();
+  counter=0;
+  attachInterrupt(digitalPinToInterrupt(PIN_SIGNAL_IN), CountFallingEdges, FALLING);
+  TMRArd_InitTimer(0, TIME_INTERVAL); 
+  
 }
 
 void loop() {
   UpdateOutputFrequency();
+  if((unsigned char)(TMRArd_IsTimerExpired(TIMER_0))){
+	  PrintIRFrequency();
+	  counter=0;
+	  TMRArd_InitTimer(0, TIME_INTERVAL); 
+  }
 }
 
 /*----------------Module Functions--------------------------*/
@@ -70,27 +80,29 @@ void SetupPins() {
   pinMode(PIN_SIGNAL_IN, INPUT);
   pinMode(PIN_SIGNAL_OUT, OUTPUT);
   pinMode(PIN_POT, INPUT);
+  
 }
 
 void UpdateOutputFrequency() {
   //read input
 	potValue = analogRead(PIN_POT);
 	uint8_t newOCR2A =  (analogRead(PIN_POT))/4;
-	
+	/*
 	Serial.print("\n raw:");
 	Serial.println(analogRead(PIN_POT));
 	Serial.print("scaled:");
 	Serial.println(newOCR2A);
+	*/
 	UpdateCompareMatchRegister(newOCR2A);
   //call update 
 }
 
 void PrintIRFrequency() {
-  //TODO 
+  Serial.println(counter);
 }
 
 void CountFallingEdges() {
-  //TODO
+	counter++;
 }
 
 /******************************************************************************
